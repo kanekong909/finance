@@ -78,6 +78,21 @@
                 <div id="month-summary-list"></div>
             </div>
 
+            <h2 style="margin-top: 30px;">Gráficos</h2>
+            <div class="charts-container">
+
+                <div class="chart-box">
+                    <h3>Gastos por Mes</h3>
+                    <canvas id="chart-month"></canvas>
+                </div>
+
+                <div class="chart-box">
+                    <h3>Categorías más usadas</h3>
+                    <canvas id="chart-category"></canvas>
+                </div>
+
+            </div>
+
         </section>
     </div>
 
@@ -118,6 +133,7 @@
     
     <!-- EL QUE FUNCIONA SIEMPRE -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="./script.js"></script>
     <script>
         if ('serviceWorker' in navigator) {

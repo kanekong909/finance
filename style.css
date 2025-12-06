@@ -313,6 +313,12 @@ button[type="submit"]:active {
     font-weight: 500;
 }
 
+.charts-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
 .expense-amount {
     font-size: 1.3rem;
     font-weight: 800;

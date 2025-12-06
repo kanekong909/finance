@@ -8,6 +8,9 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let currentExpenseId = null;
 
+let chartMonth = null;
+let chartCategory = null;
+
 // Elementos
 const authSection = document.getElementById('auth-section');
 const expensesSection = document.getElementById('expenses-section');
@@ -35,6 +38,7 @@ async function checkAuth() {
             : user.email;
 
         loadExpenses();
+
     } else {
         authSection.style.display = 'block';
         expensesSection.style.display = 'none';
@@ -129,6 +133,9 @@ async function loadExpenses() {
         });
 
     document.getElementById('summary-card').style.display = 'block';
+
+    renderChartMonths(expensesData);
+    renderChartCategories(expensesData);
 }
 
 // ----- RENDER GASTOS -----
@@ -347,6 +354,133 @@ document.getElementById('confirm-delete-btn').onclick = async () => {
     document.getElementById('delete-modal').classList.remove('active');
     loadExpenses();
 };
+
+// GRAFICOS}
+
+// ------------------------
+// GRAFICO: Gastos por Mes
+// ------------------------
+function renderChartMonths(data) {
+    const grouped = {};
+
+    data.forEach(exp => {
+        const d = new Date(exp.created_at);
+        const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+        grouped[key] = (grouped[key] || 0) + exp.amount;
+    });
+
+    // Ordenar por fecha
+    const keys = Object.keys(grouped).sort();
+
+    // 🔥 Convertir "2025-03" → "Marzo 2025"
+    const labels = keys.map(key => {
+        const [year, month] = key.split("-");
+        const dateObj = new Date(year, month - 1, 1);
+
+        return dateObj.toLocaleDateString("es-CO", {
+            month: "long",
+            year: "numeric"
+        }).replace(/^\w/, c => c.toUpperCase());
+    });
+
+    const values = keys.map(key => grouped[key]);
+
+    const ctx = document.getElementById("chart-month").getContext("2d");
+
+    if (chartMonth) chartMonth.destroy();
+
+    chartMonth = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: labels,
+            datasets: [{
+                label: "Gasto total",
+                data: values,
+                borderWidth: 2,
+                tension: 0.35
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+
+                tooltip: {
+                    callbacks: {
+                        label: (context) =>
+                            "$" + context.raw.toLocaleString("es-CO")
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    ticks: {
+                        callback: value =>
+                            "$" + value.toLocaleString("es-CO")
+                    }
+                }
+            }
+        }
+    });
+}
+
+// -----------------------------
+// GRAFICO: Categorías más usadas
+// -----------------------------
+function renderChartCategories(data) {
+    const grouped = {};
+
+    data.forEach(exp => {
+        const category = exp.description || "Sin categoría";
+        grouped[category] = (grouped[category] || 0) + exp.amount;
+    });
+
+    const labels = Object.keys(grouped);
+    const values = labels.map(x => grouped[x]);
+
+    const ctx = document.getElementById("chart-category").getContext("2d");
+
+    if (chartCategory) chartCategory.destroy();
+
+    chartCategory = new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: labels,
+            datasets: [{
+                label: "Gastos por categoría",
+                data: values,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false },
+
+                // 🍀 TOOLTIP con formato de moneda
+                tooltip: {
+                    callbacks: {
+                        label: (context) => {
+                            const value = context.raw;
+                            return "$" + value.toLocaleString("es-CO");
+                        }
+                    }
+                }
+            },
+
+            // 🍀 EJE Y con formato "$XX.XXX"
+            scales: {
+                y: {
+                    ticks: {
+                        callback: (value) => {
+                            return "$" + value.toLocaleString("es-CO");
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
 
 // Iniciar app
 checkAuth();
