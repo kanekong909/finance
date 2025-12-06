@@ -44,12 +44,30 @@
             <form id="add-expense-form">
                 <input type="number" id="amount" placeholder="Cantidad" step="0.01" required>
                 <input type="text" id="description" placeholder="Descripción o categoría" required>
+                <input type="date" id="date" placeholder="Fecha" required>
+
                 <button type="submit">Agregar Gasto</button>
             </form>
 
             <div id="summary-card" style="display:none; margin:24px 0; padding:20px; background:var(--gray-50); border-radius:12px; text-align:center;">
                 <div style="font-size:0.9rem; color:var(--gray-600);">Total este mes</div>
                 <div id="monthly-total" style="font-size:2rem; font-weight:700; color:var(--primary); margin-top:8px;">$0.00</div>
+            </div>
+
+            <div id="filters" class="filters">
+                <select id="filter-select">
+                    <option value="all">Todos</option>
+                    <option value="today">Hoy</option>
+                    <option value="week">Últimos 7 días</option>
+                    <option value="month">Este mes</option>
+                    <option value="range">Rango personalizado</option>
+                </select>
+
+                <div id="range-inputs" style="display:none; gap:6px; margin-top:8px;">
+                    <input type="date" id="start-date">
+                    <input type="date" id="end-date">
+                    <button id="apply-range">Aplicar</button>
+                </div>
             </div>
 
             <h2>Mis Gastos</h2>
@@ -67,6 +85,7 @@
             <form id="edit-form">
                 <input type="text" id="edit-description" placeholder="Descripción" required>
                 <input type="number" id="edit-amount" placeholder="Cantidad" step="0.01" required>
+                <input type="date" id="edit-date" placeholder="Fecha" required>
                 <div class="modal-actions">
                     <button type="button" class="cancel-btn">Cancelar</button>
                     <button type="submit" class="save-btn">Guardar Cambios</button>
