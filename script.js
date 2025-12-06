@@ -112,6 +112,7 @@ async function loadExpenses() {
 
     expensesData = data; // <--- Guardar para filtros
     applyFilter('all');  // <--- Mostrar por defecto
+    renderMonthlySummary(expensesData);
 
     // Total mensual
     const now = new Date();
@@ -182,6 +183,53 @@ function renderExpenses(data) {
     });
 }
 
+// ----- GRUPO POR FECHA -----
+function renderMonthlySummary(data) {
+    const container = document.getElementById('month-summary-list');
+    container.innerHTML = '';
+
+    if (!data.length) {
+        container.innerHTML = '<p style="color:#94a3b8;">No hay gastos registrados.</p>';
+        return;
+    }
+
+    // Agrupar por "YYYY-MM"
+    const groups = {};
+
+    data.forEach(exp => {
+        const d = new Date(exp.created_at);
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+
+        if (!groups[key]) groups[key] = 0;
+        groups[key] += exp.amount;
+    });
+
+    // Ordenar por mes (más reciente primero)
+    const ordered = Object.keys(groups).sort((a, b) => new Date(b + "-01") - new Date(a + "-01"));
+
+    ordered.forEach(key => {
+        const [year, month] = key.split('-');
+        const dateObj = new Date(year, month - 1, 1);
+
+        const monthName = dateObj.toLocaleDateString('es-CO', {
+            month: 'long',
+            year: 'numeric'
+        }).replace(/^\w/, c => c.toUpperCase());
+
+        const total = groups[key].toLocaleString('es-CO');
+
+        const div = document.createElement('div');
+        div.classList.add('month-item');
+
+        div.innerHTML = `
+            <span class="month-name">${monthName}</span>
+            <span class="month-total">$${total}</span>
+        `;
+
+        container.appendChild(div);
+    });
+}
+
 // ----- FILTROS -----
 const filterSelect = document.getElementById('filter-select');
 
@@ -206,6 +254,7 @@ document.getElementById('apply-range').addEventListener('click', () => {
     });
 
     renderExpenses(filtered);
+    renderMonthlySummary(filtered);
 });
 
 function applyFilter(type) {
