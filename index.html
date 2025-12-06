@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Gastos Diarios</title>
+    <link rel="stylesheet" href="./style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="icon" href="icon-192.png" sizes="192x192">
+    <link rel="apple-touch-icon" href="icon-192.png">
+</head>
+<body>
+    <div class="container">
+       <header>
+            <h1>Registro de Gastos</h1>
+            <div id="user-info" style="margin-top:8px; font-size:0.95rem; opacity:0.9;"></div>
+            <button id="logout-btn" class="logout-btn" style="display:none;">
+                Cerrar sesión
+            </button>
+
+        </header>
+        
+        <section id="auth-section">
+            <h2>Iniciar Sesión</h2>
+            <form id="login-form">
+                <input type="email" id="login-email" placeholder="Correo electrónico" required>
+                <input type="password" id="login-password" placeholder="Contraseña" required>
+                <button type="submit">Iniciar Sesión</button>
+            </form>
+            
+            <h2>Registrarse</h2>
+            <form id="signup-form">
+                <input type="email" id="signup-email" placeholder="Correo electrónico" required>
+                <input type="password" id="signup-password" placeholder="Contraseña" required>
+                <button type="submit">Registrarse</button>
+            </form>
+            
+            <button id="logout-btn" style="display: none;">Cerrar Sesión</button>
+        </section>
+        
+        <section id="expenses-section" style="display: none;">
+            <h2>Agregar Gasto</h2>
+            <form id="add-expense-form">
+                <input type="number" id="amount" placeholder="Cantidad" step="0.01" required>
+                <input type="text" id="description" placeholder="Descripción o categoría" required>
+                <button type="submit">Agregar Gasto</button>
+            </form>
+
+            <div id="summary-card" style="display:none; margin:24px 0; padding:20px; background:var(--gray-50); border-radius:12px; text-align:center;">
+                <div style="font-size:0.9rem; color:var(--gray-600);">Total este mes</div>
+                <div id="monthly-total" style="font-size:2rem; font-weight:700; color:var(--primary); margin-top:8px;">$0.00</div>
+            </div>
+
+            <h2>Mis Gastos</h2>
+            <div id="expenses-list"></div>
+        </section>
+    </div>
+
+    <!-- MODAL DE EDICIÓN -->
+    <div id="edit-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Editar Gasto</h3>
+                <button class="close-btn">&times;</button>
+            </div>
+            <form id="edit-form">
+                <input type="text" id="edit-description" placeholder="Descripción" required>
+                <input type="number" id="edit-amount" placeholder="Cantidad" step="0.01" required>
+                <div class="modal-actions">
+                    <button type="button" class="cancel-btn">Cancelar</button>
+                    <button type="submit" class="save-btn">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIRMACIÓN DE ELIMINAR -->
+    <div id="delete-modal" class="modal" style="display:none;">
+        <div class="modal-content delete-modal">
+            <svg class="warning-icon" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" fill="#fee2e2"/>
+                <text x="12" y="12" font-size="14" text-anchor="middle" dy=".3em" fill="#991b1b">!</text>
+            </svg>
+            <h3>¿Eliminar gasto?</h3>
+            <p>Esta acción no se puede deshacer.</p>
+            <div class="modal-actions">
+                <button class="cancel-btn">Cancelar</button>
+                <button id="confirm-delete-btn" class="delete-confirm-btn">Sí, eliminar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- EL QUE FUNCIONA SIEMPRE -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="./script.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('Service Worker registered'))
+                    .catch(err => console.log('Service Worker registration failed', err));
+            });
+        }
+    </script>
+</body>
+</html>
