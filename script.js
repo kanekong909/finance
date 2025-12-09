@@ -762,4 +762,32 @@ document.getElementById("download-month-pdf").addEventListener("click", () => {
     pdf.save(`reporte-${monthName}.pdf`);
 });
 
+// TEMA OSCURO/CLARO
+document.addEventListener("DOMContentLoaded", () => {
+    const toggleBtn = document.getElementById("theme-toggle");
+    const icon = toggleBtn.querySelector(".theme-icon");
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "light") {
+        document.body.classList.remove("dark");
+        icon.textContent = "🌙"; // Moon (para activar modo oscuro)
+    } else {
+        document.body.classList.add("dark");
+        icon.textContent = "☀️"; // Sun (para activar modo claro)
+    }
+
+    toggleBtn.addEventListener("click", () => {
+        const isDark = document.body.classList.toggle("dark");
+
+        if (isDark) {
+            icon.textContent = "☀️";
+            localStorage.setItem("theme", "dark");
+        } else {
+            icon.textContent = "🌙";
+            localStorage.setItem("theme", "light");
+        }
+    });
+});
+
 checkAuth();

@@ -1,4 +1,9 @@
 :root {
+    --bg: #ffffff;
+    --text: #111;
+    --card: #f1f5f9;
+    --border: #d1d5db;
+
     --bg-primary: #0c0f14;
     --bg-secondary: #151921;
     --bg-tertiary: #1c2128;
@@ -28,6 +33,35 @@
     --radius: 10px;
     --radius-lg: 14px;
 }
+
+.dark {
+    --bg: #0d1117;
+    --text: #e5e7eb;
+
+    --bg-primary: #ffffff;   /* Color claro para MODO LIGHT */
+    --bg-secondary: #f1f5f9;
+    --bg-tertiary: #e5e7eb;
+    --bg-hover: #d1d5db;
+
+    --text-primary: #0d1117;
+    --text-secondary: #1f2937;
+    --text-muted: #6b7280;
+
+    --card: #ffffff;
+    --border: #d1d5db;
+    --border-light: #e5e7eb;
+
+    --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.10);
+    --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.12);
+
+    --primary: #0891b2;
+    --primary-hover: #0e7490;
+    --primary-light: rgba(6, 182, 212, 0.2);
+
+    --danger: #e11d48;
+}
+
 
 * {
     margin: 0;
@@ -838,3 +872,43 @@ button[type="submit"]:active {
   box-shadow: 0 3px 10px rgba(0,0,0,0.15);
 }
 
+/* THEME SECTION */
+/* THEME TOGGLE BUTTON */
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+
+    width: 45px;
+    height: 45px;
+
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: var(--text-primary);
+
+    box-shadow: var(--shadow-sm);
+    transition: all .25s ease;
+    z-index: 999;
+}
+
+.theme-toggle:hover {
+    background: var(--bg-hover);
+    transform: translateY(-2px);
+}
+
+.theme-toggle:active {
+    transform: scale(0.95);
+}
+
+/* Optional: Smooth transitions */
+body, section, input, button, .expense-item {
+    transition: background .25s ease, color .25s ease, border .25s ease;
+}
