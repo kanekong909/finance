@@ -6,6 +6,25 @@ let expensesData = [];
 const { createClient } = window.supabase;
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// Detectar sesión al cargar la página (especial para Google OAuth)
+supabase.auth.getSession().then(({ data }) => {
+    if (data.session) {
+        console.log("Sesión recuperada (OAuth):", data.session.user);
+        checkAuth();
+    }
+});
+
+// Escuchar cualquier cambio de sesión
+supabase.auth.onAuthStateChange((event, session) => {
+    console.log("Evento de auth:", event);
+
+    if (session) {
+        checkAuth();
+    }
+});
+
+
+
 let currentExpenseId = null;
 
 let chartMonth = null;
@@ -69,6 +88,38 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
     if (error) alert(error.message);
     else alert('Registro exitoso. Revisa tu correo.');
 });
+
+document.getElementById("google-login").addEventListener("click", async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+            redirectTo: window.location.origin
+        }
+    });
+});
+
+document.getElementById("google-signup").addEventListener("click", async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+            redirectTo: window.location.origin
+        }
+    });
+});
+
+
+// Cambiar a registro
+document.getElementById("go-signup").onclick = () => {
+    document.getElementById("auth-login").style.display = "none";
+    document.getElementById("auth-signup").style.display = "block";
+};
+
+// Cambiar a login
+document.getElementById("go-login").onclick = () => {
+    document.getElementById("auth-login").style.display = "block";
+    document.getElementById("auth-signup").style.display = "none";
+};
+
 
 logoutBtn.addEventListener('click', async () => {
     await supabase.auth.signOut();

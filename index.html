@@ -12,7 +12,8 @@
 </head>
 <body>
     <div class="container">
-       <header>
+        <!-- HEADER -->
+        <header>
             <h1>Registro de Gastos</h1>
             <div id="user-info" style="margin-top:8px; font-size:0.95rem; opacity:0.9;"></div>
             <button id="logout-btn" class="logout-btn" style="display:none;">
@@ -21,24 +22,58 @@
 
         </header>
         
-        <section id="auth-section">
-            <h2>Iniciar Sesión</h2>
-            <form id="login-form">
-                <input type="email" id="login-email" placeholder="Correo electrónico" required>
-                <input type="password" id="login-password" placeholder="Contraseña" required>
-                <button type="submit">Iniciar Sesión</button>
-            </form>
-            
-            <h2>Registrarse</h2>
-            <form id="signup-form">
-                <input type="email" id="signup-email" placeholder="Correo electrónico" required>
-                <input type="password" id="signup-password" placeholder="Contraseña" required>
-                <button type="submit">Registrarse</button>
-            </form>
-            
-            <button id="logout-btn" style="display: none;">Cerrar Sesión</button>
-        </section>
-        
+        <!-- SECCION DE AUTENTICACIÓN -->
+       <section id="auth-section">
+
+    <!-- LOGIN -->
+    <div id="auth-login" class="auth-box">
+        <h2>Iniciar Sesión</h2>
+
+        <form id="login-form">
+            <input type="email" id="login-email" placeholder="Correo electrónico" required>
+            <input type="password" id="login-password" placeholder="Contraseña" required>
+            <button type="submit">Iniciar Sesión</button>
+        </form>
+
+        <!-- BOTÓN GOOGLE -->
+        <button type="button" id="google-login" class="google-btn">
+            Iniciar sesión con Google
+        </button>
+
+        <p class="switch-auth">
+            ¿No tienes cuenta?
+            <button type="button" id="go-signup">Registrarse</button>
+        </p>
+    </div>
+
+    <!-- SIGNUP -->
+    <div id="auth-signup" class="auth-box" style="display:none;">
+        <h2>Registrarse</h2>
+
+        <form id="signup-form">
+            <input type="email" id="signup-email" placeholder="Correo electrónico" required>
+            <input type="password" id="signup-password" placeholder="Contraseña" required>
+            <button type="submit">Registrarse</button>
+        </form>
+
+        <!-- BOTÓN GOOGLE -->
+        <button type="button" id="google-signup" class="google-btn">
+            Registrarse con Google
+        </button>
+
+        <p class="switch-auth">
+            ¿Ya tienes cuenta?
+            <button type="button" id="go-login">Iniciar Sesión</button>
+        </p>
+    </div>
+
+    <!-- LOGOUT -->
+    <button id="logout-btn" style="display: none;">Cerrar Sesión</button>
+
+</section>
+
+
+        <!-- SECCION DE REGISTRO DE GASTOS -->
         <section id="expenses-section" style="display: none;">
             <h2>Agregar Gasto</h2>
             <form id="add-expense-form">

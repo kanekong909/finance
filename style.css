@@ -710,3 +710,40 @@ button[type="submit"]:active {
 .month-total.green {
     color: #2a9d8f;
 }
+
+/* SWITCH ENTRE LOGIN E INICIO DE SESION */
+.switch-auth {
+    margin-top: 12px;
+    font-size: 0.9rem;
+    color: #64748b;
+    text-align: center;
+}
+
+.switch-auth button {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* GOOGLE BTN */
+.google-btn {
+    width: 100%;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.google-btn:hover {
+    background: #f7f7f7;
+}
+
