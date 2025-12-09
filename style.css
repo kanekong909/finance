@@ -747,3 +747,94 @@ button[type="submit"]:active {
     background: #f7f7f7;
 }
 
+
+/* DESCARGAR REPORTES */
+.report-selectors {
+    display: flex;
+    gap: 16px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.report-select {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.report-select label {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.h2-reporte-mensual{
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-top: 25px;
+    margin-bottom: 24px;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.95rem;
+}
+.h2-reporte-mensual::before {
+    content: '';
+    width: 3px;
+    height: 20px;
+    background: var(--primary);
+    border-radius: 2px;
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+}
+
+.report-select select {
+    padding: 10px 14px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--bg-tertiary);
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.2s;
+    color: white;
+}
+
+.report-select select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#download-month-pdf {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-end;
+  gap: 8px;
+
+  background: linear-gradient(135deg, #141414, #0d0d0d);
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: all 0.25s ease;
+}
+
+#download-month-pdf img {
+    width: 20px;
+}
+
+#download-month-pdf:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.20);
+}
+
+#download-month-pdf:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}
+

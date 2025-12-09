@@ -23,55 +23,54 @@
         </header>
         
         <!-- SECCION DE AUTENTICACIÓN -->
-       <section id="auth-section">
+        <section id="auth-section">
 
-    <!-- LOGIN -->
-    <div id="auth-login" class="auth-box">
-        <h2>Iniciar Sesión</h2>
+                <!-- LOGIN -->
+                <div id="auth-login" class="auth-box">
+                    <h2>Iniciar Sesión</h2>
 
-        <form id="login-form">
-            <input type="email" id="login-email" placeholder="Correo electrónico" required>
-            <input type="password" id="login-password" placeholder="Contraseña" required>
-            <button type="submit">Iniciar Sesión</button>
-        </form>
+                    <form id="login-form">
+                        <input type="email" id="login-email" placeholder="Correo electrónico" required>
+                        <input type="password" id="login-password" placeholder="Contraseña" required>
+                        <button type="submit">Iniciar Sesión</button>
+                    </form>
 
-        <!-- BOTÓN GOOGLE -->
-        <button type="button" id="google-login" class="google-btn">
-            Iniciar sesión con Google
-        </button>
+                    <!-- BOTÓN GOOGLE -->
+                    <button type="button" id="google-login" class="google-btn">
+                        Iniciar sesión con Google
+                    </button>
 
-        <p class="switch-auth">
-            ¿No tienes cuenta?
-            <button type="button" id="go-signup">Registrarse</button>
-        </p>
-    </div>
+                    <p class="switch-auth">
+                        ¿No tienes cuenta?
+                        <button type="button" id="go-signup">Registrarse</button>
+                    </p>
+                </div>
 
-    <!-- SIGNUP -->
-    <div id="auth-signup" class="auth-box" style="display:none;">
-        <h2>Registrarse</h2>
+                <!-- SIGNUP -->
+                <div id="auth-signup" class="auth-box" style="display:none;">
+                    <h2>Registrarse</h2>
 
-        <form id="signup-form">
-            <input type="email" id="signup-email" placeholder="Correo electrónico" required>
-            <input type="password" id="signup-password" placeholder="Contraseña" required>
-            <button type="submit">Registrarse</button>
-        </form>
+                    <form id="signup-form">
+                        <input type="email" id="signup-email" placeholder="Correo electrónico" required>
+                        <input type="password" id="signup-password" placeholder="Contraseña" required>
+                        <button type="submit">Registrarse</button>
+                    </form>
 
-        <!-- BOTÓN GOOGLE -->
-        <button type="button" id="google-signup" class="google-btn">
-            Registrarse con Google
-        </button>
+                    <!-- BOTÓN GOOGLE -->
+                    <button type="button" id="google-signup" class="google-btn">
+                        Registrarse con Google
+                    </button>
 
-        <p class="switch-auth">
-            ¿Ya tienes cuenta?
-            <button type="button" id="go-login">Iniciar Sesión</button>
-        </p>
-    </div>
+                    <p class="switch-auth">
+                        ¿Ya tienes cuenta?
+                        <button type="button" id="go-login">Iniciar Sesión</button>
+                    </p>
+                </div>
 
-    <!-- LOGOUT -->
-    <button id="logout-btn" style="display: none;">Cerrar Sesión</button>
+                <!-- LOGOUT -->
+                <button id="logout-btn" style="display: none;">Cerrar Sesión</button>
 
-</section>
-
+        </section>
 
         <!-- SECCION DE REGISTRO DE GASTOS -->
         <section id="expenses-section" style="display: none;">
@@ -108,6 +107,26 @@
             <h2>Mis Gastos</h2>
             <input id="search-expense" type="text" placeholder="Buscar gasto..." />
             <div id="expenses-list"></div>
+
+
+            <!-- Descargar reporte -->
+            <h2 class="h2-reporte-mensual">Reporte Mensual</h2>
+            <div class="report-selectors">
+                <div class="report-select">
+                    <label>Año:</label>
+                    <select id="report-year"></select>
+                </div>
+
+                <div class="report-select">
+                    <label>Mes:</label>
+                    <select id="report-month" disabled></select>
+                </div>
+
+            </div>
+            <button id="download-month-pdf">
+                <img src="./assets/file.svg" alt="Reporte PDF">
+                Descargar Reporte PDF
+            </button>
 
             <div class="month-summary">
                 <h3>Gastos por Mes</h3>
@@ -168,6 +187,7 @@
     </div>
     
     <!-- EL QUE FUNCIONA SIEMPRE -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="./script.js"></script>

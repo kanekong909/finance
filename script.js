@@ -23,8 +23,6 @@ supabase.auth.onAuthStateChange((event, session) => {
     }
 });
 
-
-
 let currentExpenseId = null;
 
 let chartMonth = null;
@@ -190,6 +188,9 @@ async function loadExpenses() {
 
     renderChartMonths(expensesData);
     renderChartCategories(expensesData);
+
+     // 🔥 Cargar los años y meses AHORA que ya tenemos datos
+    loadAvailableYears();
 }
 
 // ----- RENDER GASTOS -----
@@ -545,5 +546,220 @@ searchInput.addEventListener("input", () => {
     });
 });
 
-// Iniciar app
+
+// Generar lista de años disponibles
+function loadAvailableYears() {
+    const yearSelect = document.getElementById("report-year");
+    const years = new Set();
+
+    expensesData.forEach(exp => {
+        const d = new Date(exp.created_at);
+        years.add(d.getFullYear());
+    });
+
+    const sortedYears = [...years].sort((a, b) => b - a); // de más reciente a más viejo
+    yearSelect.innerHTML = "";
+
+    sortedYears.forEach(year => {
+        const opt = document.createElement("option");
+        opt.value = year;
+        opt.textContent = year;
+        yearSelect.appendChild(opt);
+    });
+
+    // Cargar meses del año seleccionado automáticamente
+    loadAvailableMonths(yearSelect.value);
+}
+
+// Cargar meses del año elegido
+function loadAvailableMonths(selectedYear) {
+    const monthSelect = document.getElementById("report-month");
+    monthSelect.innerHTML = "";
+
+    const months = new Set();
+
+    expensesData.forEach(exp => {
+        const d = new Date(exp.created_at);
+        if (d.getFullYear() == selectedYear) {
+            months.add(d.getMonth()); // 0–11
+        }
+    });
+
+    const sortedMonths = [...months].sort((a, b) => a - b);
+
+    sortedMonths.forEach(m => {
+        const date = new Date(selectedYear, m, 1);
+        const name = date.toLocaleDateString("es-CO", { month: "long" })
+                         .replace(/^\w/, c => c.toUpperCase());
+
+        const opt = document.createElement("option");
+        opt.value = m;
+        opt.textContent = name;
+        monthSelect.appendChild(opt);
+    });
+
+    monthSelect.disabled = sortedMonths.length === 0;
+}
+
+document.getElementById("report-year").addEventListener("change", e => {
+    loadAvailableMonths(e.target.value);
+});
+
+// DESCARGAR REPORTE EN PDF
+document.getElementById("download-month-pdf").addEventListener("click", () => {
+    const year = document.getElementById("report-year").value;
+    const month = document.getElementById("report-month").value;
+
+    if (!year || month === "") {
+        alert("Selecciona un año y un mes.");
+        return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF();
+
+    const monthStart = new Date(year, month, 1);
+    const monthEnd = new Date(year, Number(month) + 1, 1);
+
+    const monthName = monthStart.toLocaleDateString("es-CO", {
+        month: "long",
+        year: "numeric"
+    }).replace(/^\w/, c => c.toUpperCase());
+
+    const monthlyExpenses = expensesData.filter(exp => {
+        const d = new Date(exp.created_at);
+        return d >= monthStart && d < monthEnd;
+    });
+
+    if (monthlyExpenses.length === 0) {
+        alert("No hay gastos en ese mes.");
+        return;
+    }
+
+    const total = monthlyExpenses.reduce((s, x) => s + x.amount, 0);
+
+    // Colores
+    const primaryColor = [41, 128, 185];    // Azul
+    const accentColor = [52, 152, 219];     // Azul claro
+    const textDark = [44, 62, 80];          // Gris oscuro
+    const lightGray = [236, 240, 241];      // Gris claro
+
+    // Header con fondo de color
+    pdf.setFillColor(...primaryColor);
+    pdf.rect(0, 0, 210, 45, 'F');
+
+    // Título en blanco
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(24);
+    pdf.setFont(undefined, 'bold');
+    pdf.text('Reporte de Gastos', 105, 20, { align: 'center' });
+
+    pdf.setFontSize(16);
+    pdf.setFont(undefined, 'normal');
+    pdf.text(monthName, 105, 32, { align: 'center' });
+
+    // Línea decorativa
+    pdf.setDrawColor(...accentColor);
+    pdf.setLineWidth(1);
+    pdf.line(20, 40, 190, 40);
+
+    // Caja de total con fondo
+    pdf.setFillColor(...lightGray);
+    pdf.roundedRect(20, 50, 170, 20, 3, 3, 'F');
+
+    pdf.setTextColor(...textDark);
+    pdf.setFontSize(14);
+    pdf.setFont(undefined, 'bold');
+    pdf.text('Total del Mes:', 25, 61);
+
+    pdf.setTextColor(...primaryColor);
+    pdf.setFontSize(18);
+    const totalFormatted = `$${total.toLocaleString("es-CO")}`;
+    pdf.text(totalFormatted, 185, 62, { align: 'right' });
+
+    // Sección de detalle
+    pdf.setTextColor(...textDark);
+    pdf.setFontSize(14);
+    pdf.setFont(undefined, 'bold');
+    pdf.text('Detalle de Gastos', 20, 82);
+
+    // Línea bajo el título
+    pdf.setDrawColor(...accentColor);
+    pdf.setLineWidth(0.5);
+    pdf.line(20, 85, 190, 85);
+
+    let y = 95;
+    let isEven = false;
+
+    monthlyExpenses.forEach((exp, index) => {
+        const date = new Date(exp.created_at).toLocaleDateString("es-CO");
+        const amount = `$${exp.amount.toLocaleString("es-CO")}`;
+
+        // Fondo alternado para cada fila
+        if (isEven) {
+            pdf.setFillColor(250, 250, 250);
+            pdf.rect(20, y - 6, 170, 10, 'F');
+        }
+
+        // Número de ítem
+        pdf.setTextColor(...accentColor);
+        pdf.setFontSize(10);
+        pdf.setFont(undefined, 'bold');
+        pdf.text(`${index + 1}.`, 22, y);
+
+        // Fecha
+        pdf.setTextColor(...textDark);
+        pdf.setFontSize(9);
+        pdf.setFont(undefined, 'normal');
+        pdf.text(date, 30, y);
+
+        // Descripción
+        pdf.setFontSize(10);
+        const maxWidth = 100;
+        const description = exp.description.length > 50 
+            ? exp.description.substring(0, 50) + '...' 
+            : exp.description;
+        pdf.text(description, 60, y);
+
+        // Monto (alineado a la derecha)
+        pdf.setFont(undefined, 'bold');
+        pdf.setTextColor(...primaryColor);
+        pdf.text(amount, 185, y, { align: 'right' });
+
+        y += 10;
+        isEven = !isEven;
+
+        // Nueva página si es necesario
+        if (y > 270) {
+            pdf.addPage();
+            
+            // Repetir header en nueva página
+            pdf.setFillColor(...primaryColor);
+            pdf.rect(0, 0, 210, 25, 'F');
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFontSize(16);
+            pdf.setFont(undefined, 'bold');
+            pdf.text(`Reporte de Gastos — ${monthName}`, 105, 16, { align: 'center' });
+            
+            y = 35;
+            isEven = false;
+        }
+    });
+
+    // Footer en la última página
+    const pageCount = pdf.internal.getNumberOfPages();
+    pdf.setPage(pageCount);
+    
+    pdf.setFillColor(...lightGray);
+    pdf.rect(0, 280, 210, 17, 'F');
+    
+    pdf.setTextColor(...textDark);
+    pdf.setFontSize(8);
+    pdf.setFont(undefined, 'normal');
+    const footerText = `Generado el ${new Date().toLocaleDateString("es-CO")} | Total de gastos: ${monthlyExpenses.length}`;
+    pdf.text(footerText, 105, 290, { align: 'center' });
+
+    pdf.save(`reporte-${monthName}.pdf`);
+});
+
 checkAuth();
