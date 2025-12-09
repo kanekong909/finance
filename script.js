@@ -11,6 +11,9 @@ let currentExpenseId = null;
 let chartMonth = null;
 let chartCategory = null;
 
+// Buscador
+const searchInput = document.getElementById("search-expense");
+
 // Elementos
 const authSection = document.getElementById('auth-section');
 const expensesSection = document.getElementById('expenses-section');
@@ -481,6 +484,15 @@ function renderChartCategories(data) {
         }
     });
 }
+
+// Buscador item
+searchInput.addEventListener("input", () => {
+    const term = searchInput.value.toLowerCase();
+    document.querySelectorAll(".expense-item").forEach(item => {
+        const text = item.innerText.toLowerCase();
+        item.style.display = text.includes(term) ? "grid" : "none";
+    });
+});
 
 // Iniciar app
 checkAuth();

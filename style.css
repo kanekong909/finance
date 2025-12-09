@@ -245,6 +245,36 @@ button[type="submit"]:active {
     flex-direction: column;
     gap: 14px;
     margin-top: 24px;
+
+    /* 🔥 Controla la altura máxima visible */
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 6px;
+}
+
+/* Scroll bonito */
+#expenses-list::-webkit-scrollbar {
+    width: 6px;
+}
+#expenses-list::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 20px;
+}
+
+/* Buscador */
+#search-expense {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--bg-tertiary);
+    margin-top: 10px;
+    transition: 0.25s;
+}
+
+#search-expense:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-alpha);
 }
 
 .expense-item {
@@ -252,10 +282,10 @@ button[type="submit"]:active {
     border: 1px solid var(--border);
     border-left: 3px solid transparent;
     border-radius: var(--radius);
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    gap: 18px;
+    padding: 14px;
+    gap: 12px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     animation: slideInLeft 0.5s ease-out backwards;
     position: relative;
