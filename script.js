@@ -27,6 +27,7 @@ let currentExpenseId = null;
 
 let chartMonth = null;
 let chartCategory = null;
+let chartCategoryLines = null;
 
 // Buscador
 const searchInput = document.getElementById("search-expense");
@@ -188,6 +189,7 @@ async function loadExpenses() {
 
     renderChartMonths(expensesData);
     renderChartCategories(expensesData);
+    renderChartCategoryLines(expensesData);
 
      // 🔥 Cargar los años y meses AHORA que ya tenemos datos
     loadAvailableYears();
@@ -411,7 +413,6 @@ document.getElementById('confirm-delete-btn').onclick = async () => {
 };
 
 // GRAFICOS}
-
 // ------------------------
 // GRAFICO: Gastos por Mes
 // ------------------------
@@ -497,6 +498,19 @@ function renderChartCategories(data) {
 
     if (chartCategory) chartCategory.destroy();
 
+    // 🎨 Generar colores suaves en modo HSL
+    const generateColors = (num) => {
+        const colors = [];
+        for (let i = 0; i < num; i++) {
+            const hue = (i * 45) % 360;
+            colors.push(`hsl(${hue}, 70%, 60%)`); // color pastel
+        }
+        return colors;
+    };
+
+    const backgroundColors = generateColors(labels.length);
+    const borderColors = backgroundColors.map(c => c.replace("60%", "40%")); // un poco más oscuro
+
     chartCategory = new Chart(ctx, {
         type: "bar",
         data: {
@@ -504,7 +518,10 @@ function renderChartCategories(data) {
             datasets: [{
                 label: "Gastos por categoría",
                 data: values,
-                borderWidth: 1
+                backgroundColor: backgroundColors,
+                borderColor: borderColors,
+                borderWidth: 2,
+                borderRadius: 6
             }]
         },
         options: {
@@ -512,7 +529,6 @@ function renderChartCategories(data) {
             plugins: {
                 legend: { display: false },
 
-                // 🍀 TOOLTIP con formato de moneda
                 tooltip: {
                     callbacks: {
                         label: (context) => {
@@ -522,14 +538,94 @@ function renderChartCategories(data) {
                     }
                 }
             },
-
-            // 🍀 EJE Y con formato "$XX.XXX"
             scales: {
                 y: {
                     ticks: {
-                        callback: (value) => {
-                            return "$" + value.toLocaleString("es-CO");
-                        }
+                        callback: (value) => "$" + value.toLocaleString("es-CO")
+                    }
+                }
+            }
+        }
+    });
+}
+
+// -----------------------------
+// GRAFICO LINEAS: Categorías más usadas
+// -----------------------------
+function renderChartCategoryLines(data) {
+    const grouped = {};
+
+    data.forEach(exp => {
+        const d = new Date(exp.created_at);
+        const monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+        const category = exp.description || "Sin categoría";
+
+        if (!grouped[monthKey]) grouped[monthKey] = {};
+        if (!grouped[monthKey][category]) grouped[monthKey][category] = 0;
+
+        grouped[monthKey][category] += exp.amount;
+    });
+
+    const months = Object.keys(grouped).sort();
+
+    // obtener categorías únicas
+    const categories = new Set();
+    months.forEach(m => {
+        Object.keys(grouped[m]).forEach(cat => categories.add(cat));
+    });
+    const categoriesArray = Array.from(categories);
+
+    // Labels: "Mar 2025"
+    const labels = months.map(key => {
+        const [year, month] = key.split("-");
+        const dateObj = new Date(year, month - 1, 1);
+        return dateObj.toLocaleDateString("es-CO", {
+            month: "short",
+            year: "numeric"
+        }).replace(/^\w/, c => c.toUpperCase());
+    });
+
+    // una línea por categoría
+    const datasets = categoriesArray.map((category, index) => ({
+        label: category,
+        data: months.map(m => grouped[m][category] || 0),
+        borderWidth: 2,
+        tension: 0.35,
+        fill: false,
+    }));
+
+    const ctx = document.getElementById("chart-category-lines").getContext("2d");
+
+    if (chartCategoryLines) chartCategoryLines.destroy();
+
+    chartCategoryLines = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: labels,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: context =>
+                            `${context.dataset.label}: $${context.raw.toLocaleString("es-CO")}`
+                    }
+                },
+
+                legend: {
+                    position: "bottom",
+                    labels: {
+                        boxWidth: 12
+                    }
+                }
+            },
+
+            scales: {
+                y: {
+                    ticks: {
+                        callback: value => "$" + value.toLocaleString("es-CO")
                     }
                 }
             }
