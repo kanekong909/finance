@@ -139,40 +139,122 @@ document.getElementById("go-login").onclick = () => {
     document.getElementById("auth-signup").style.display = "none";
 };
 
-
+// Salir
 logoutBtn.addEventListener('click', async () => {
     await supabase.auth.signOut();
     checkAuth();
 });
 
+
+// =============== FORMATO MONEDA COLOMBIANA EN TIEMPO REAL ===============
+const amountInput = document.getElementById("amount");
+
+// Función para limpiar el valor (quitar puntos y convertir a número)
+function cleanValue(value) {
+    return parseFloat(value.replace(/\./g, '')) || 0;
+}
+
+// Función para formatear con puntos colombianos
+function formatCOP(value) {
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+// FORMATO PARA INPUT DE PRESUPUESTO (reutilizando tus funciones)
+budgetInput.addEventListener("input", (e) => {
+    let value = e.target.value.replace(/[^\d]/g, ""); // solo números
+
+    if (value === "") {
+        e.target.value = "";
+        return;
+    }
+
+    e.target.value = formatCOP(value);
+});
+
+// Al escribir: permitir solo números y formatear
+amountInput.addEventListener("input", (e) => {
+    let value = e.target.value;
+
+    // Remover todo lo que no sea número
+    value = value.replace(/[^\d]/g, "");
+
+    if (value === "") {
+        e.target.value = "";
+        return;
+    }
+
+    // Formatear con puntos
+    const formatted = formatCOP(value);
+    e.target.value = formatted;
+});
+
 // ----- AGREGAR GASTO -----
+
 document.getElementById('add-expense-form').addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const amount = parseFloat(document.getElementById('amount').value);
+    // Obtener valor limpio
+    const rawValue = amountInput.value.replace(/\./g, '');
+    const amount = parseFloat(rawValue);
+
+    if (!amount || amount <= 0) {
+        alert("Por favor ingresa una cantidad válida");
+        return;
+    }
+
     const description = document.getElementById('description').value.trim();
     const { data: { user } } = await supabase.auth.getUser();
-
     const date = document.getElementById('date').value;
 
     const { error } = await supabase
         .from('expenses')
         .insert({
             user_id: user.id,
-            amount,
+            amount: amount, // ← Aquí va el número limpio
             description,
             created_at: date ? dateToUTC(date) : new Date().toISOString()
         });
 
-
     if (!error) {
-        document.getElementById('amount').value = '';
+        // Limpiar campos
+        amountInput.value = '';
         document.getElementById('description').value = '';
+        document.getElementById('date').value = '';
         loadExpenses();
-    } else alert(error.message);
-
-    document.getElementById('date').value = '';
+        updateBudgetUI(); // ← Importante: actualizar presupuesto si cambia el mes actual
+    } else {
+        alert(error.message);
+    }
 });
+
+// ----- AGREGAR GASTO #2 -----
+// document.getElementById('add-expense-form').addEventListener('submit', async (e) => {
+//     e.preventDefault();
+
+//     const amount = parseFloat(document.getElementById('amount').value);
+//     const description = document.getElementById('description').value.trim();
+//     const { data: { user } } = await supabase.auth.getUser();
+
+//     const date = document.getElementById('date').value;
+
+//     const { error } = await supabase
+//         .from('expenses')
+//         .insert({
+//             user_id: user.id,
+//             amount,
+//             description,
+//             created_at: date ? dateToUTC(date) : new Date().toISOString()
+//         });
+
+
+//     if (!error) {
+//         document.getElementById('amount').value = '';
+//         document.getElementById('description').value = '';
+//         loadExpenses();
+//     } else alert(error.message);
+
+//     document.getElementById('date').value = '';
+// });
 
 // ----- CARGAR GASTOS -----
 async function loadExpenses() {
@@ -926,7 +1008,7 @@ async function loadMonthlyBudget() {
 
     if (data && data.amount > 0) {
         currentBudget = data.amount;
-        budgetInput.value = data.amount;
+        budgetInput.value = formatCOP(data.amount);  // ← Mostrar con puntos
         setBudgetMode("saved");
     } else {
         currentBudget = null;
@@ -946,10 +1028,11 @@ editBudgetBtn.addEventListener("click", () => {
 
 // Botón Guardar / Actualizar
 saveBudgetBtn.addEventListener("click", async () => {
-    const amountStr = budgetInput.value.trim();
-    const amount = Number(amountStr);
+    // Quitamos los puntos del formato visual para obtener el número real
+    const rawValue = budgetInput.value.replace(/\./g, "");
+    const amount = Number(rawValue);
 
-    if (!amountStr || amount <= 0) {
+    if (!rawValue || amount <= 0) {
         alert("Por favor ingresa un monto válido mayor a cero");
         return;
     }
@@ -963,7 +1046,7 @@ saveBudgetBtn.addEventListener("click", async () => {
             user_id: user.id,
             year: currentYear,
             month: currentMonth,
-            amount: amount
+            amount: amount  // ← Guardamos el número limpio (sin puntos)
         }, {
             onConflict: "user_id,year,month"
         });
@@ -974,8 +1057,12 @@ saveBudgetBtn.addEventListener("click", async () => {
         return;
     }
 
+    // Éxito: actualizamos las variables y la UI
     currentBudget = amount;
-    budgetInput.value = amount;
+
+    // Volvemos a mostrar el valor con formato bonito (1.200.000)
+    budgetInput.value = formatCOP(amount);
+
     setBudgetMode("saved");
     updateBudgetUI();
 });
@@ -1087,6 +1174,5 @@ deleteBudgetBtn.addEventListener("click", async () => {
     setBudgetMode("empty");
     updateBudgetUI();
 });
-
 
 checkAuth();

@@ -192,6 +192,66 @@ input::placeholder {
     font-weight: 400;
 }
 
+/* INPUT DE NUMERO */
+/* Chrome, Edge, Safari */
+/* INPUTS CON MONEDA - REUTILIZABLE PARA GASTOS Y PRESUPUESTO */
+.currency-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.currency-wrapper::before {
+    content: "$";
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #dfdfdf;           /* Morado bonito como tu tema */
+    font-size: 1.2rem;
+    font-weight: 600;
+    pointer-events: none;
+    z-index: 2;
+    transition: color 0.3s ease;
+}
+
+.currency-wrapper input {
+    width: 100%;
+    padding: 16px 18px 16px 44px;  /* Más espacio para el $ grande */
+    background: #2d2d2d;
+    border: 1px solid #333;
+    border-radius: 14px;
+    color: white;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    text-align: right;  /* Números alineados a la derecha = más profesional */
+}
+
+.currency-wrapper input:focus {
+    outline: none;
+    border-color: #e1e1e1;
+    box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.2);
+    background: #333;
+}
+
+.currency-wrapper input:focus::placeholder {
+    color: #999;
+}
+
+.currency-wrapper input:disabled {
+    background: #252525;
+    color: #aaa;
+    cursor: not-allowed;
+}
+
+.currency-wrapper input::placeholder {
+    color: #888;
+}
+
+/* Opcional: hacer el $ más brillante al hacer foco */
+.currency-wrapper input:focus + ::before {
+    color: #d5d5d5;
+}
+
 #date {
     width: 100%;
     color: white;
@@ -736,6 +796,7 @@ button[type="submit"]:active {
 .month-name {
     font-weight: 500;
     color: #9b9b9b;
+    font-size: 14px;
 }
 
 /* Total gastado */
@@ -922,7 +983,7 @@ body, section, input, button, .expense-item {
 /* PRESUPUESTO MENSUAL - ESTILO MEJORADO Y RESPONSIVE */
 #budget-card {
     width: 100%;
-    margin: 22px;
+    /* margin: 22px; */
     padding: 28px;
     background: linear-gradient(145deg, #1a1a1a, #222222);
     border-radius: 20px;
@@ -950,7 +1011,7 @@ body, section, input, button, .expense-item {
 #budget-input {
     margin-top: 10px;
     flex: 1;
-    width: 200px; /* Evita que sea muy pequeño en móvil */
+    /* width: 100%; */
     padding: 16px 18px;
     background: #2d2d2d;
     border: 1px solid #333;

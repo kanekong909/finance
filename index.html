@@ -80,7 +80,18 @@
         <section id="expenses-section" style="display: none;">
             <h2>Agregar Gasto</h2>
             <form id="add-expense-form">
-                <input type="number" id="amount" placeholder="Cantidad" step="0.01" required>
+                <div class="currency-wrapper">
+                    <input
+                        type="text"
+                        id="amount"
+                        placeholder="Cantidad"
+                        inputmode="decimal"
+                        autocomplete="off"
+                        required
+                        class="currency-input"
+                    />
+                </div>
+
                 <input type="text" id="description" placeholder="Descripción o categoría" required>
                 <input type="date" id="date" placeholder="Fecha" required>
 
@@ -98,12 +109,17 @@
                     <span class="budget-title">Presupuesto mensual</span>
                     
                     <div class="budget-input-group" id="budget-input-group">
-                        <input 
-                            type="number" 
-                            id="budget-input" 
-                            placeholder="Ej: 1200000"
-                            disabled
-                        >
+                        <div class="currency-wrapper budget-currency-wrapper">
+                            <input
+                                type="text"
+                                id="budget-input"
+                                placeholder="Ej: 1.200.000"
+                                inputmode="decimal"
+                                autocomplete="off"
+                                disabled
+                                class="currency-input"
+                            />
+                        </div>
                         <button id="edit-budget-btn" class="edit-budget-btn">Editar</button>
                         <button id="save-budget" class="save-budget-btn">Guardar</button>
                         <button id="delete-budget-btn" class="delete-budget-btn">Eliminar</button>
