@@ -192,6 +192,11 @@ input::placeholder {
     font-weight: 400;
 }
 
+#date {
+    width: 100%;
+    color: white;
+}
+
 input:focus {
     border-color: var(--primary);
     background: var(--bg-hover);
