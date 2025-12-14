@@ -229,7 +229,7 @@ input::placeholder {
 .currency-wrapper input:focus {
     outline: none;
     border-color: #e1e1e1;
-    box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.2);
+    box-shadow: 0 0 0 4px rgba(139, 228, 250, 0.2);
     background: #333;
 }
 
