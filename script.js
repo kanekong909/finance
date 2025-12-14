@@ -929,7 +929,6 @@ async function loadMonthlyBudget() {
   }
 }
 
-
 saveBudgetBtn.addEventListener("click", async () => {
   const amount = Number(budgetInput.value);
   if (!amount || amount <= 0) {
@@ -962,7 +961,6 @@ saveBudgetBtn.addEventListener("click", async () => {
   currentBudget = amount;
   updateBudgetUI();
 });
-
 
 function updateBudgetUI() {
   if (!currentBudget) return;
