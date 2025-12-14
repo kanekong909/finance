@@ -92,6 +92,32 @@
                 <div id="monthly-total" style="font-size:2rem; font-weight:700; color:var(--primary); margin-top:8px;">$0.00</div>
             </div>
 
+            <!-- PRESUPUESTO MENSUAL -->
+            <div id="budget-card" class="budget-card">
+                <div class="budget-header">
+                    <span>Presupuesto mensual</span>
+                    <input 
+                        type="number" 
+                        id="budget-input" 
+                        placeholder="Ej: 1200000"
+                    >
+                    <button id="save-budget">Guardar</button>
+                </div>
+
+                <div class="budget-bar">
+                    <div id="budget-progress"></div>
+                </div>
+
+                <div class="budget-info">
+                    <div class="budgets">
+                        <span id="budget-text"></span>
+                        <span id="budget-expenses"></span>
+                    </div>
+                    <span id="budget-percent"></span>
+                </div>
+            </div>
+
+            <!-- FILTROS -->
             <div id="filters" class="filters">
                 <select id="filter-select">
                     <option value="all">Todos</option>
@@ -109,9 +135,10 @@
             </div>
 
             <h2>Mis Gastos</h2>
+
+            <!-- BUSCADOR -->
             <input id="search-expense" type="text" placeholder="Buscar gasto..." />
             <div id="expenses-list"></div>
-
 
             <!-- Descargar reporte -->
             <h2 class="h2-reporte-mensual">Reporte Mensual</h2>

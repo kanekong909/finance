@@ -912,3 +912,106 @@ button[type="submit"]:active {
 body, section, input, button, .expense-item {
     transition: background .25s ease, color .25s ease, border .25s ease;
 }
+
+/* PRESUPUESTO MENSUAL */
+#budget-card {
+    max-width: 100%;
+    margin: 40px auto;
+    padding: 28px;
+    background: #1e1e1e;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.221);
+    color: #e0e0e0;
+    font-family: 'Inter', sans-serif;
+}
+
+.budget-header span {
+    font-size: 1.3rem;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+#budget-input {
+    width: 100%;
+    padding: 14px;
+    background: #2d2d2d;
+    border: none;
+    border-radius: 10px;
+    color: white;
+}
+
+#save-budget {
+    margin-top: 12px;
+    padding: 14px;
+    width: 100%;
+    background: #000000;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.budget-bar {
+  width: 100%;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 10px;
+  margin-bottom: 15px;
+}
+
+#budget-progress {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+  background: #3b82f6; /* azul por defecto */
+}
+
+
+#budget-text,
+#budget-expenses {
+    font-size: 15px;
+}
+.money-pill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+  margin-left: 6px;
+}
+
+/* Azul */
+.pill-blue {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+}
+
+/* Rojo */
+.pill-red {
+  background: rgba(252, 29, 29, 0.15);
+  color: rgb(252, 29, 29);
+}
+
+
+#budget-progress {
+    height: 100%;
+    width: 0%;
+    background: #a78bfa;
+    border-radius: 8px;
+    transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 15px rgba(167, 139, 250, 0.4);
+}
+
+.budgets {
+    display: flex;
+    justify-content: space-between;
+}
+
+@media (max-width: 768px) {
+    .budgets {
+        flex-direction: column;
+        gap: 20px;
+    }
+}

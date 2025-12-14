@@ -25,9 +25,26 @@ supabase.auth.onAuthStateChange((event, session) => {
 
 let currentExpenseId = null;
 
+// VARIABLES GRAFICOS
 let chartMonth = null;
 let chartCategory = null;
 let chartCategoryLines = null;
+
+// VARIABLE PRESUPUESTO
+const budgetCard = document.getElementById("budget-card");
+const budgetInput = document.getElementById("budget-input");
+const saveBudgetBtn = document.getElementById("save-budget");
+const budgetProgress = document.getElementById("budget-progress");
+const budgetText = document.getElementById("budget-text");
+const budgetPercent = document.getElementById("budget-percent");
+const budgetExpenses = document.getElementById("budget-expenses");
+
+let currentBudget = null;
+let currentMonthExpenses = 0;
+const now = new Date();
+const currentYear = now.getFullYear();
+const currentMonth = now.getMonth() + 1; // 1-12
+
 
 // Buscador
 const searchInput = document.getElementById("search-expense");
@@ -44,7 +61,6 @@ function dateToUTC(dateStr) {
     return new Date(Date.UTC(y, m - 1, d, 12, 0, 0)).toISOString();
 }
 
-
 // ----- AUTENTICACIÓN -----
 async function checkAuth() {
     const { data: { user } } = await supabase.auth.getUser();
@@ -59,6 +75,8 @@ async function checkAuth() {
             : user.email;
 
         loadExpenses();
+        loadMonthlyBudget();
+
 
     } else {
         authSection.style.display = 'block';
@@ -178,12 +196,15 @@ async function loadExpenses() {
     const totalMonth = data
         .filter(d => new Date(d.created_at) >= monthStart)
         .reduce((s, d) => s + parseFloat(d.amount), 0);
+    
+    currentMonthExpenses = totalMonth;
 
     document.getElementById('monthly-total').textContent =
         '$' + totalMonth.toLocaleString('es-CO', {
             minimumFractionDigits: 0,
             maximumFractionDigits: 0
         });
+    
 
     document.getElementById('summary-card').style.display = 'block';
 
@@ -193,6 +214,7 @@ async function loadExpenses() {
 
      // 🔥 Cargar los años y meses AHORA que ya tenemos datos
     loadAvailableYears();
+    updateBudgetUI();
 }
 
 // ----- RENDER GASTOS -----
@@ -638,7 +660,7 @@ searchInput.addEventListener("input", () => {
     const term = searchInput.value.toLowerCase();
     document.querySelectorAll(".expense-item").forEach(item => {
         const text = item.innerText.toLowerCase();
-        item.style.display = text.includes(term) ? "grid" : "none";
+        item.style.display = text.includes(term) ? "flex" : "none";
     });
 });
 
@@ -885,5 +907,95 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+
+// PRESUPUESTO MENSUAL
+async function loadMonthlyBudget() {
+  const { data, error } = await supabase
+    .from("monthly_budget")
+    .select("amount")
+    .eq("year", currentYear)
+    .eq("month", currentMonth)
+    .single();
+
+  if (error && error.code !== "PGRST116") {
+    console.error("Error cargando presupuesto", error);
+    return;
+  }
+
+  if (data) {
+    currentBudget = data.amount;
+    budgetInput.value = data.amount;
+    updateBudgetUI();
+  }
+}
+
+
+saveBudgetBtn.addEventListener("click", async () => {
+  const amount = Number(budgetInput.value);
+  if (!amount || amount <= 0) {
+    alert("Monto inválido");
+    return;
+  }
+
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const { error } = await supabase
+    .from("monthly_budget")
+    .upsert(
+      {
+        user_id: user.id,
+        year: currentYear,
+        month: currentMonth,
+        amount
+      },
+      {
+        onConflict: "user_id,year,month"
+      }
+    );
+
+  if (error) {
+    console.error(error);
+    alert("Error guardando");
+    return;
+  }
+
+  currentBudget = amount;
+  updateBudgetUI();
+});
+
+
+function updateBudgetUI() {
+  if (!currentBudget) return;
+
+  // Texto
+  budgetText.innerHTML =
+    `Presupuesto del mes:
+     <span class="money-pill pill-blue">
+       $${currentBudget.toLocaleString("es-CO")}
+     </span>`;
+
+  budgetExpenses.innerHTML =
+    `Gastado este mes:
+     <span class="money-pill pill-red">
+       $${currentMonthExpenses.toLocaleString("es-CO")}
+     </span>`;
+
+  // Porcentaje
+  const percent = Math.min(
+    (currentMonthExpenses / currentBudget) * 100,
+    100
+  );
+
+  budgetProgress.style.width = percent + "%";
+
+  // Color según uso
+  if (percent < 60) {
+    budgetProgress.style.background = "#22c55e"; // verde
+  } else if (percent < 85) {
+    budgetProgress.style.background = "#facc15"; // amarillo
+  } else {
+    budgetProgress.style.background = "#ef4444"; // rojo
+  }
+}
 
 checkAuth();
