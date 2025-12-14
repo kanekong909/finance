@@ -38,6 +38,8 @@ const budgetProgress = document.getElementById("budget-progress");
 const budgetText = document.getElementById("budget-text");
 const budgetPercent = document.getElementById("budget-percent");
 const budgetExpenses = document.getElementById("budget-expenses");
+const editBudgetBtn = document.getElementById("edit-budget-btn");
+const deleteBudgetBtn = document.getElementById("delete-budget-btn");
 
 let currentBudget = null;
 let currentMonthExpenses = 0;
@@ -910,90 +912,181 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // PRESUPUESTO MENSUAL
 async function loadMonthlyBudget() {
-  const { data, error } = await supabase
-    .from("monthly_budget")
-    .select("amount")
-    .eq("year", currentYear)
-    .eq("month", currentMonth)
-    .single();
+    const { data, error } = await supabase
+        .from("monthly_budget")
+        .select("amount")
+        .eq("year", currentYear)
+        .eq("month", currentMonth)
+        .single();
 
-  if (error && error.code !== "PGRST116") {
-    console.error("Error cargando presupuesto", error);
-    return;
-  }
+    if (error && error.code !== "PGRST116") { // PGRST116 = no se encontró fila
+        console.error("Error cargando presupuesto:", error);
+        return;
+    }
 
-  if (data) {
-    currentBudget = data.amount;
-    budgetInput.value = data.amount;
+    if (data && data.amount > 0) {
+        currentBudget = data.amount;
+        budgetInput.value = data.amount;
+        setBudgetMode("saved");
+    } else {
+        currentBudget = null;
+        budgetInput.value = "";
+        setBudgetMode("empty");
+    }
+
     updateBudgetUI();
-  }
 }
 
-saveBudgetBtn.addEventListener("click", async () => {
-  const amount = Number(budgetInput.value);
-  if (!amount || amount <= 0) {
-    alert("Monto inválido");
-    return;
-  }
-
-  const { data: { user } } = await supabase.auth.getUser();
-
-  const { error } = await supabase
-    .from("monthly_budget")
-    .upsert(
-      {
-        user_id: user.id,
-        year: currentYear,
-        month: currentMonth,
-        amount
-      },
-      {
-        onConflict: "user_id,year,month"
-      }
-    );
-
-  if (error) {
-    console.error(error);
-    alert("Error guardando");
-    return;
-  }
-
-  currentBudget = amount;
-  updateBudgetUI();
+// Botón Editar
+editBudgetBtn.addEventListener("click", () => {
+    setBudgetMode("editing");
+    budgetInput.disabled = false;
+    budgetInput.focus();
 });
 
-function updateBudgetUI() {
-  if (!currentBudget) return;
+// Botón Guardar / Actualizar
+saveBudgetBtn.addEventListener("click", async () => {
+    const amountStr = budgetInput.value.trim();
+    const amount = Number(amountStr);
 
-  // Texto
-  budgetText.innerHTML =
-    `Presupuesto del mes:
-     <span class="money-pill pill-blue">
-       $${currentBudget.toLocaleString("es-CO")}
-     </span>`;
+    if (!amountStr || amount <= 0) {
+        alert("Por favor ingresa un monto válido mayor a cero");
+        return;
+    }
 
-  budgetExpenses.innerHTML =
-    `Gastado este mes:
-     <span class="money-pill pill-red">
-       $${currentMonthExpenses.toLocaleString("es-CO")}
-     </span>`;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
 
-  // Porcentaje
-  const percent = Math.min(
-    (currentMonthExpenses / currentBudget) * 100,
-    100
-  );
+    const { error } = await supabase
+        .from("monthly_budget")
+        .upsert({
+            user_id: user.id,
+            year: currentYear,
+            month: currentMonth,
+            amount: amount
+        }, {
+            onConflict: "user_id,year,month"
+        });
 
-  budgetProgress.style.width = percent + "%";
+    if (error) {
+        console.error("Error guardando presupuesto:", error);
+        alert("No se pudo guardar el presupuesto");
+        return;
+    }
 
-  // Color según uso
-  if (percent < 60) {
-    budgetProgress.style.background = "#22c55e"; // verde
-  } else if (percent < 85) {
-    budgetProgress.style.background = "#facc15"; // amarillo
-  } else {
-    budgetProgress.style.background = "#ef4444"; // rojo
-  }
+    currentBudget = amount;
+    budgetInput.value = amount;
+    setBudgetMode("saved");
+    updateBudgetUI();
+});
+
+// Controla los estados visuales: empty | saved | editing
+function setBudgetMode(mode) {
+    // Removemos todas las clases de estado
+    budgetCard.classList.remove("no-budget", "budget-editing");
+
+    if (mode === "empty") {
+        budgetCard.classList.add("no-budget");
+        budgetInput.disabled = true;
+        saveBudgetBtn.textContent = "Guardar";
+    } else if (mode === "saved") {
+        budgetInput.disabled = true;
+        saveBudgetBtn.textContent = "Actualizar";
+    } else if (mode === "editing") {
+        budgetCard.classList.add("budget-editing");
+        budgetInput.disabled = false;
+        saveBudgetBtn.textContent = currentBudget ? "Actualizar" : "Guardar";
+    }
 }
+
+function updateBudgetUI() {
+    if (!currentBudget || currentBudget <= 0) {
+        budgetText.innerHTML = "Aún no has definido un presupuesto para este mes";
+        budgetExpenses.innerHTML = `
+            Gastado este mes:
+            <span class="money-pill pill-red">
+                $${currentMonthExpenses.toLocaleString("es-CO")}
+            </span>`;
+        budgetPercent.textContent = "";
+        budgetProgress.style.width = "0%";
+        document.getElementById("budget-remaining").textContent = "";
+        return;
+    }
+
+    // Presupuesto definido
+    budgetText.innerHTML = `
+        Presupuesto del mes:
+        <span class="money-pill pill-blue">
+            $${currentBudget.toLocaleString("es-CO")}
+        </span>`;
+
+    budgetExpenses.innerHTML = `
+        Gastado este mes:
+        <span class="money-pill pill-red">
+            $${currentMonthExpenses.toLocaleString("es-CO")}
+        </span>`;
+
+    const percent = Math.min((currentMonthExpenses / currentBudget) * 100, 100);
+    const percentText = percent.toFixed(0);
+
+    budgetPercent.innerHTML = `<strong>${percentText}%</strong> usado`;
+
+    budgetProgress.style.width = percent + "%";
+
+    // Colores dinámicos de la barra
+    budgetProgress.classList.remove("low", "medium", "high");
+    if (percent < 60) {
+        budgetProgress.classList.add("low");
+    } else if (percent < 85) {
+        budgetProgress.classList.add("medium");
+    } else {
+        budgetProgress.classList.add("high");
+    }
+
+    // ================= NUEVO: CÁLCULO DEL RESTANTE =================
+    const remaining = currentBudget - currentMonthExpenses;
+    const remainingEl = document.getElementById("budget-remaining");
+
+    if (remaining > 0) {
+        remainingEl.textContent = `Te sobran $${remaining.toLocaleString("es-CO")} 💰`;
+        remainingEl.className = "budget-remaining positive";
+    } else if (remaining < 0) {
+        const over = Math.abs(remaining);
+        remainingEl.textContent = `Te pasaste por $${over.toLocaleString("es-CO")} ⚠️`;
+        remainingEl.className = "budget-remaining negative";
+    } else {
+        remainingEl.textContent = "Exacto al presupuesto 👌";
+        remainingEl.className = "budget-remaining neutral";
+    }
+}
+
+// ELIMINAR PRESUPUESTO
+deleteBudgetBtn.addEventListener("click", async () => {
+    if (!confirm("¿Estás seguro de que quieres eliminar el presupuesto de este mes?")) {
+        return;
+    }
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { error } = await supabase
+        .from("monthly_budget")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("year", currentYear)
+        .eq("month", currentMonth);
+
+    if (error) {
+        console.error("Error eliminando presupuesto:", error);
+        alert("No se pudo eliminar el presupuesto");
+        return;
+    }
+
+    currentBudget = null;
+    budgetInput.value = "";
+    setBudgetMode("empty");
+    updateBudgetUI();
+});
+
 
 checkAuth();

@@ -913,105 +913,285 @@ body, section, input, button, .expense-item {
     transition: background .25s ease, color .25s ease, border .25s ease;
 }
 
-/* PRESUPUESTO MENSUAL */
+/* NUEVOS ESTILOS PARA LA EDICIÓN DEL PRESUPUESTO - Adaptados a tu dark mode */
+/* PRESUPUESTO MENSUAL - ESTILO MEJORADO Y RESPONSIVE */
 #budget-card {
     max-width: 100%;
-    margin: 40px auto;
+    margin: 32px auto;
     padding: 28px;
-    background: #1e1e1e;
-    border-radius: 18px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.221);
+    background: linear-gradient(145deg, #1a1a1a, #222222);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
     color: #e0e0e0;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.budget-header span {
-    font-size: 1.3rem;
-    margin-bottom: 5px;
+.budget-title {
+    font-size: 1.4rem;
     font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 20px;
+}
+
+.budget-input-group {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap; /* Responsive: en móvil los botones bajan */
 }
 
 #budget-input {
-    width: 100%;
-    padding: 14px;
+    margin-top: 10px;
+    flex: 1;
+    min-width: 200px; /* Evita que sea muy pequeño en móvil */
+    padding: 16px 18px;
     background: #2d2d2d;
-    border: none;
-    border-radius: 10px;
+    border: 1px solid #333;
+    border-radius: 14px;
     color: white;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
 }
 
-#save-budget {
-    margin-top: 12px;
-    padding: 14px;
-    width: 100%;
-    background: #000000;
+#budget-input:focus {
+    outline: none;
+    border-color: #a78bfa;
+    box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.2),
+                0 0 20px rgba(167, 139, 250, 0.15);
+    background: #333;
+}
+
+#budget-input:disabled {
+    background: #252525;
+    color: #aaa;
+    cursor: not-allowed;
+    border-color: #333;
+}
+
+.edit-budget-btn,
+.save-budget-btn {
+    padding: 16px 24px;
     border: none;
-    border-radius: 10px;
-    color: white;
+    border-radius: 14px;
     font-weight: 600;
+    font-size: 1rem;
     cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.edit-budget-btn {
+    background: #333333;
+    color: #cccccc;
+    border: 1px solid #444;
+}
+
+.edit-budget-btn:hover {
+    background: #444444;
+    transform: translateY(-2px);
+}
+
+.save-budget-btn {
+    background: linear-gradient(90deg, #282828, #8b5cf6);
+    color: white;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+}
+
+.save-budget-btn:hover {
+    background: linear-gradient(90deg, #1a1a1a, #7c3aed);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+}
+
+/* Verde cuando es nuevo presupuesto */
+#budget-card.no-budget .save-budget-btn {
+    background: linear-gradient(90deg, #10b981, #34d399);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+#budget-card.no-budget .save-budget-btn:hover {
+    background: linear-gradient(90deg, #059669, #10b981);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
 }
 
 .budget-bar {
-  width: 100%;
-  height: 10px;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 999px;
-  overflow: hidden;
-  margin-top: 10px;
-  margin-bottom: 15px;
+    width: 100%;
+    height: 14px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 28px 0 24px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
-
-#budget-progress {
-  height: 100%;
-  width: 0%;
-  border-radius: 999px;
-  transition: width 0.4s ease;
-  background: #3b82f6; /* azul por defecto */
-}
-
-
-#budget-text,
-#budget-expenses {
-    font-size: 15px;
-}
-.money-pill {
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-weight: 600;
-  margin-left: 6px;
-}
-
-/* Azul */
-.pill-blue {
-  background: rgba(59, 130, 246, 0.15);
-  color: #3b82f6;
-}
-
-/* Rojo */
-.pill-red {
-  background: rgba(252, 29, 29, 0.15);
-  color: rgb(252, 29, 29);
-}
-
 
 #budget-progress {
     height: 100%;
     width: 0%;
-    background: #a78bfa;
-    border-radius: 8px;
-    transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 0 15px rgba(167, 139, 250, 0.4);
+    border-radius: 999px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+                background 0.4s ease;
+    box-shadow: 0 0 20px rgba(167, 139, 250, 0.4);
+    background: linear-gradient(90deg, #a78bfa, #c4b5fd);
+}
+
+#budget-progress.low { 
+    background: linear-gradient(90deg, #22c55e, #86efac);
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+}
+
+#budget-progress.medium { 
+    background: linear-gradient(90deg, #facc15, #fde047);
+    box-shadow: 0 0 20px rgba(250, 220, 21, 0.5);
+}
+
+#budget-progress.high { 
+    background: linear-gradient(90deg, #ef4444, #f87171);
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+}
+
+.budget-info {
+    margin-top: 8px;
 }
 
 .budgets {
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: 14px;
 }
 
-@media (max-width: 768px) {
+.money-pill {
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-weight: 600;
+    margin-left: 8px;
+    font-size: 13px;
+    
+}
+
+.pill-blue {
+    background: rgba(139, 92, 246, 0.2);
+    color: #c4b5fd;
+}
+
+.pill-red {
+    background: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+}
+
+#budget-percent {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #bbbbbb;
+}
+
+/* RESPONSIVE - MÓVIL */
+@media (max-width: 640px) {
+    #budget-card {
+        padding: 14px;
+        margin: 10px;
+        border-radius: 18px;
+    }
+
+    .budget-title {
+        font-size: 1.3rem;
+        margin-bottom: 10px;
+    }
+
+    .budget-input-group {
+        flex-direction: column;
+    }
+
+    #budget-input {
+        min-width: 100%;
+    }
+
+    .edit-budget-btn,
+    .save-budget-btn {
+        width: 100%;
+        padding: 16px;
+    }
+
     .budgets {
         flex-direction: column;
         gap: 20px;
+    }
+}
+
+/* RESTANTE O FALTANTE */
+.budget-remaining {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    padding: 12px 16px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    transition: all 0.4s ease;
+}
+
+.budget-remaining.positive {
+    color: #86efac;
+    box-shadow: 0 0 15px rgba(34, 197, 94, 0.2);
+}
+
+.budget-remaining.negative {
+    color: #fca5a5;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
+}
+
+.budget-remaining.neutral {
+    color: #bbbbbb;
+}
+
+/* En móvil un poco más compacto */
+@media (max-width: 640px) {
+    .budget-remaining {
+        font-size: 1.1rem;
+        margin-top: 16px;
+        padding: 10px 14px;
+    }
+}
+
+/* ELIMINAR PRESUPUESTO */
+.delete-budget-btn {
+    padding: 16px 20px;
+    border: none;
+    border-radius: 14px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: linear-gradient(90deg, #282828, #ef4444);
+    box-shadow: 0 6px 20px rgba(241, 99, 99, 0.4);
+    color: white;
+    border: 1px solid #444;
+    white-space: nowrap;
+}
+
+.delete-budget-btn:hover {
+    background: linear-gradient(90deg, #1a1a1a, #f13737);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(241, 99, 99, 0.4);
+}
+
+
+/* Ocultar botón eliminar cuando no hay presupuesto o está en edición */
+#budget-card.no-budget .delete-budget-btn,
+#budget-card.budget-editing .delete-budget-btn {
+    display: none;
+}
+
+/* En móvil: apilar botones */
+@media (max-width: 640px) {
+    .delete-budget-btn {
+        width: 100%;
+        padding: 16px;
     }
 }

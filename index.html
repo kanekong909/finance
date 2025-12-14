@@ -90,18 +90,24 @@
             <div id="summary-card" style="display:none; margin:24px 0; padding:20px; background:var(--gray-50); border-radius:12px; text-align:center;">
                 <div style="font-size:0.9rem; color:var(--gray-600);">Total este mes</div>
                 <div id="monthly-total" style="font-size:2rem; font-weight:700; color:var(--primary); margin-top:8px;">$0.00</div>
-            </div>
+            </div><div class="budget-info">
 
             <!-- PRESUPUESTO MENSUAL -->
             <div id="budget-card" class="budget-card">
                 <div class="budget-header">
-                    <span>Presupuesto mensual</span>
-                    <input 
-                        type="number" 
-                        id="budget-input" 
-                        placeholder="Ej: 1200000"
-                    >
-                    <button id="save-budget">Guardar</button>
+                    <span class="budget-title">Presupuesto mensual</span>
+                    
+                    <div class="budget-input-group" id="budget-input-group">
+                        <input 
+                            type="number" 
+                            id="budget-input" 
+                            placeholder="Ej: 1200000"
+                            disabled
+                        >
+                        <button id="edit-budget-btn" class="edit-budget-btn">Editar</button>
+                        <button id="save-budget" class="save-budget-btn">Guardar</button>
+                        <button id="delete-budget-btn" class="delete-budget-btn">Eliminar</button>
+                    </div>
                 </div>
 
                 <div class="budget-bar">
@@ -110,10 +116,12 @@
 
                 <div class="budget-info">
                     <div class="budgets">
-                        <span id="budget-text"></span>
+                        <span id="budget-text">Aún no has definido un presupuesto</span>
                         <span id="budget-expenses"></span>
                     </div>
                     <span id="budget-percent"></span>
+                    <!-- NUEVA LÍNEA: restante -->
+                    <div id="budget-remaining" class="budget-remaining"></div>
                 </div>
             </div>
 
