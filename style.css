@@ -916,8 +916,8 @@ body, section, input, button, .expense-item {
 /* NUEVOS ESTILOS PARA LA EDICIÓN DEL PRESUPUESTO - Adaptados a tu dark mode */
 /* PRESUPUESTO MENSUAL - ESTILO MEJORADO Y RESPONSIVE */
 #budget-card {
-    max-width: 100%;
-    margin: 32px auto;
+    width: 100%;
+    margin: 22px;
     padding: 28px;
     background: linear-gradient(145deg, #1a1a1a, #222222);
     border-radius: 20px;
@@ -945,7 +945,7 @@ body, section, input, button, .expense-item {
 #budget-input {
     margin-top: 10px;
     flex: 1;
-    min-width: 200px; /* Evita que sea muy pequeño en móvil */
+    width: 200px; /* Evita que sea muy pequeño en móvil */
     padding: 16px 18px;
     background: #2d2d2d;
     border: 1px solid #333;
@@ -1104,11 +1104,13 @@ body, section, input, button, .expense-item {
     }
 
     .budget-input-group {
+        margin-top: 10px;
         flex-direction: column;
     }
 
     #budget-input {
         min-width: 100%;
+        margin-bottom: 15px;
     }
 
     .edit-budget-btn,
@@ -1161,6 +1163,7 @@ body, section, input, button, .expense-item {
 
 /* ELIMINAR PRESUPUESTO */
 .delete-budget-btn {
+    width: 100%;
     padding: 16px 20px;
     border: none;
     border-radius: 14px;
