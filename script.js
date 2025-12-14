@@ -78,8 +78,6 @@ async function checkAuth() {
 
         loadExpenses();
         loadMonthlyBudget();
-
-
     } else {
         authSection.style.display = 'block';
         expensesSection.style.display = 'none';
@@ -288,7 +286,6 @@ async function loadExpenses() {
             minimumFractionDigits: 0,
             maximumFractionDigits: 0
         });
-    
 
     document.getElementById('summary-card').style.display = 'block';
 
@@ -299,6 +296,7 @@ async function loadExpenses() {
      // 🔥 Cargar los años y meses AHORA que ya tenemos datos
     loadAvailableYears();
     updateBudgetUI();
+    loadBudgetHistory(); // ← ¡NUEVO!
 }
 
 // ----- RENDER GASTOS -----
@@ -1174,5 +1172,81 @@ deleteBudgetBtn.addEventListener("click", async () => {
     setBudgetMode("empty");
     updateBudgetUI();
 });
+
+// HISTORIAL DE PRESUPUETOS
+async function loadBudgetHistory() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    // Cargar todos los presupuestos del usuario
+    const { data: budgets, error } = await supabase
+        .from("monthly_budget")
+        .select("year, month, amount")
+        .eq("user_id", user.id)
+        .order("year", { ascending: false })
+        .order("month", { ascending: false });
+
+    if (error || !budgets || budgets.length === 0) {
+        document.getElementById("history-list").innerHTML = 
+            '<p class="no-history">Aún no tienes presupuestos en meses anteriores.</p>';
+        return;
+    }
+
+    // Calcular gastos por mes (usando expensesData que ya tienes cargada)
+    const monthlyExpenses = {};
+    expensesData.forEach(exp => {
+        const d = new Date(exp.created_at);
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+        monthlyExpenses[key] = (monthlyExpenses[key] || 0) + exp.amount;
+    });
+
+    const historyList = document.getElementById("history-list");
+    historyList.innerHTML = "";
+
+    budgets.forEach(b => {
+        const key = `${b.year}-${String(b.month).padStart(2, "0")}`;
+        const monthDate = new Date(b.year, b.month - 1, 1);
+        const monthName = monthDate.toLocaleDateString("es-CO", {
+            month: "long",
+            year: "numeric"
+        }).replace(/^\w/, c => c.toUpperCase());
+
+        const spent = monthlyExpenses[key] || 0;
+        const remaining = b.amount - spent;
+
+        const item = document.createElement("div");
+        item.className = "history-item";
+
+        let statusText = "";
+        let statusClass = "neutral";
+
+        if (remaining > 0) {
+            statusText = `Te sobran $${remaining.toLocaleString("es-CO")} 💰`;
+            statusClass = "positive";
+        } else if (remaining < 0) {
+            statusText = `Te pasaste por $${Math.abs(remaining).toLocaleString("es-CO")} ⚠️`;
+            statusClass = "negative";
+        } else {
+            statusText = "Exacto al presupuesto 👌";
+        }
+
+        item.innerHTML = `
+            <div class="history-month">${monthName}</div>
+            <div class="history-details">
+                <div class="history-detail">
+                    <span class="history-label">Presupuesto</span>
+                    <span class="history-value">$${b.amount.toLocaleString("es-CO")}</span>
+                </div>
+                <div class="history-detail">
+                    <span class="history-label">Gastado</span>
+                    <span class="history-value">$${spent.toLocaleString("es-CO")}</span>
+                </div>
+                <div class="history-status ${statusClass}">${statusText}</div>
+            </div>
+        `;
+
+        historyList.appendChild(item);
+    });
+}
 
 checkAuth();

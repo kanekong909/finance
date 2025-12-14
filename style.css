@@ -1264,3 +1264,117 @@ body, section, input, button, .expense-item {
         padding: 16px;
     }
 }
+
+/* HISTORIAL DE PRESUPUESTOS */
+/* HISTORIAL DE PRESUPUESTOS */
+.budget-history {
+    max-width: 100%;
+    margin: 40px auto 0;
+    padding: 24px;
+    background: linear-gradient(145deg, #1a1a1a, #222222);
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.history-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.history-item {
+    padding: 18px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 14px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.history-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.history-month {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #e0e0e0;
+    margin-bottom: 12px;
+}
+
+.history-details {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 1rem;
+}
+
+.history-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.history-label {
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+.history-value {
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.history-status {
+    align-self: center;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.history-status.positive {
+    background: rgba(34, 197, 94, 0.2);
+    color: #86efac;
+}
+
+.history-status.negative {
+    background: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+}
+
+.history-status.neutral {
+    background: rgba(100, 100, 100, 0.2);
+    color: #bbbbbb;
+}
+
+.no-history {
+    text-align: center;
+    color: #888;
+    font-style: italic;
+    padding: 40px 20px;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .history-details {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .history-status {
+        align-self: flex-start;
+    }
+}
