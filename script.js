@@ -157,6 +157,110 @@ function formatCOP(value) {
     return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
 
+// TOMAR FOTO DE RECIBO
+const receiptPhotoInput = document.getElementById("receipt-photo");
+const receiptPreview = document.getElementById("receipt-preview");
+const ocrStatus = document.getElementById("ocr-status");
+
+receiptPhotoInput.addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Mostrar preview
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+        receiptPreview.innerHTML = `<img src="${ev.target.result}" alt="Recibo">`;
+    };
+    reader.readAsDataURL(file);
+
+    ocrStatus.textContent = "Procesando recibo... 📷";
+
+    try {
+    const worker = await Tesseract.createWorker();
+    await worker.load();
+    await worker.loadLanguage('spa');
+    await worker.initialize('spa');
+
+    const { data: { text } } = await worker.recognize(file);
+    await worker.terminate();
+
+    ocrStatus.textContent = "¡Listo! Analizando recibo...";
+
+    console.log("Texto extraído del recibo:", text); // ← Abre la consola del navegador para ver qué detectó
+
+    // === MEJOR DETECCIÓN DE MONTO ===
+    // Busca patrones comunes en recibos colombianos
+    const amountPatterns = [
+        /total[\s:]*\$?[\s]*([\d\.]+,?\d*)/i,
+        /valor[\s a pagar]*[\s:]*\$?[\s]*([\d\.]+,?\d*)/i,
+        /pagar[\s:]*\$?[\s]*([\d\.]+,?\d*)/i,
+        /importe[\s:]*\$?[\s]*([\d\.]+,?\d*)/i,
+        /subtotal[\s:]*\$?[\s]*([\d\.]+,?\d*)/i,
+        /\$\$?[\s]*([\d\.]+,?\d*)/,  // $ seguido de número
+        /([\d\.]+,?\d*)\s*(cop|pesos)/i,  // número grande al final
+    ];
+
+    let detectedAmount = null;
+
+    for (let pattern of amountPatterns) {
+        const match = text.match(pattern);
+        if (match) {
+            detectedAmount = match[1];
+            break;
+        }
+    }
+
+    // Si no encontró con esos patrones, busca el número más grande del texto
+    if (!detectedAmount) {
+        const numbers = text.match(/[\d\.]+,?\d*/g);
+        if (numbers) {
+            detectedAmount = numbers.reduce((max, num) => {
+                const n = parseFloat(num.replace(/\./g, '').replace(',', '.'));
+                return n > max ? num : max;
+            }, "0");
+        }
+    }
+
+    // Rellenar monto si encontramos algo
+    if (detectedAmount) {
+        let cleanAmount = detectedAmount.replace(/\./g, '').replace(',', '.');
+        let numericAmount = Math.round(parseFloat(cleanAmount));
+        amountInput.value = formatCOP(numericAmount);
+        ocrStatus.textContent = `Monto detectado: $${formatCOP(numericAmount)}. ¡Corrige si es necesario!`;
+    } else {
+        ocrStatus.textContent = "No se detectó monto automáticamente. Ingresa manualmente.";
+    }
+
+    // === MEJOR DETECCIÓN DE DESCRIPCIÓN (TIENDA) ===
+    const lines = text.split('\n').map(l => l.trim().toLowerCase());
+
+    const commonStores = [
+        "éxito", "exito", "carulla", "jumbo", "d1", "ara", "olimplica", "olímpica",
+        "precio bajo", "homecenter", "falabella", "uber", "rappi", "didi food",
+        "farmatodo", "cruz verde", "locatel", "colsubsidio", "cafeteria", "panaderia"
+    ];
+
+    let storeFound = "Recibo";
+
+    for (let line of lines) {
+        for (let store of commonStores) {
+            if (line.includes(store)) {
+                // Capitalizar nombre
+                storeFound = store.charAt(0).toUpperCase() + store.slice(1);
+                break;
+            }
+        }
+        if (storeFound !== "Recibo") break;
+    }
+
+    document.getElementById("description").value = storeFound;
+
+    } catch (err) {
+        console.error("Error OCR:", err);
+        ocrStatus.textContent = "Error al procesar la imagen. Ingresa los datos manualmente.";
+    }
+});
+
 // FORMATO PARA INPUT DE PRESUPUESTO (reutilizando tus funciones)
 budgetInput.addEventListener("input", (e) => {
     let value = e.target.value.replace(/[^\d]/g, ""); // solo números
@@ -224,35 +328,6 @@ document.getElementById('add-expense-form').addEventListener('submit', async (e)
         alert(error.message);
     }
 });
-
-// ----- AGREGAR GASTO #2 -----
-// document.getElementById('add-expense-form').addEventListener('submit', async (e) => {
-//     e.preventDefault();
-
-//     const amount = parseFloat(document.getElementById('amount').value);
-//     const description = document.getElementById('description').value.trim();
-//     const { data: { user } } = await supabase.auth.getUser();
-
-//     const date = document.getElementById('date').value;
-
-//     const { error } = await supabase
-//         .from('expenses')
-//         .insert({
-//             user_id: user.id,
-//             amount,
-//             description,
-//             created_at: date ? dateToUTC(date) : new Date().toISOString()
-//         });
-
-
-//     if (!error) {
-//         document.getElementById('amount').value = '';
-//         document.getElementById('description').value = '';
-//         loadExpenses();
-//     } else alert(error.message);
-
-//     document.getElementById('date').value = '';
-// });
 
 // ----- CARGAR GASTOS -----
 async function loadExpenses() {
